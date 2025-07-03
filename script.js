@@ -88,8 +88,7 @@ const gameData = {
             content: [
                 '红酒杯A："今晚这酒真香！我喝得可开心了～"',
                 '红酒杯B："咦？我的酒怎么有点怪味？苦苦的，跟平时不一样诶..."',
-                '红酒杯A："咦？你的酒和我的不一样吗？"',
-                '红酒杯B："是啊，我的酒里好像有什么奇怪的东西，味道很苦涩..."'
+                '红酒杯A："咦？你的酒和我的不一样吗？"'
             ]
         },
         'sofas': {
@@ -109,8 +108,7 @@ const gameData = {
             content: [
                 '门："妈的，今晚真遭罪。第一个家伙敲门跟砸门似的，疼死我了！"',
                 '门锁："还有个坏蛋用铁丝捅我，疼死我了！我这把老骨头哪受得了这个！"',
-                '门："对对对！第二个人倒是礼貌，按了门铃，但是第三个人..."',
-                '门锁："第三个人太过分了！用撬锁工具硬生生把我弄开，我现在还疼着呢！"'
+                '门："对对对！第二个人倒是礼貌，按了门铃..."'
             ]
         },
         'bed': {
@@ -119,25 +117,22 @@ const gameData = {
                 '床："又要失眠了，先是两个人在我身上恩恩爱爱..."',
                 '枕头："然后就剩一个人躺着不动了，我还以为他睡着了呢..."',
                 '床："最后又来一个人压在上面，把我压得不轻！"',
-                '枕头："那个人用我闷住了躺着的人，但是奇怪的是，那个人早就没有反应了..."'
+                '枕头："那个人用我闷住了躺着的人，可那个人早就没有反应了..."'
             ]
         },
         'drink': {
             title: '饮料罐的独白',
             content: [
                 '饮料瓶："好困啊！哪个缺德的往我肚子里塞了白色药片..."',
-                '"搞得我现在昏昏沉沉的，没人喝我也算了，还让我这么难受！"',
-                '"我记得是一个穿制服的年轻人带来的，说是什么特殊快递..."',
-                '"唉，我到现在还在床头柜上，一口都没被人喝过..."'
+                '"搞得我现在昏昏沉沉的，结果压根儿没人搭理我！"',
+                '"还敢要什么五星好评..."'
             ]
         },
         'floor': {
             title: '地板的独白',
             content: [
-                '地板："哎呦，我的腰！今晚来了三个人，把我踩得够呛..."',
-                '"第一个人脚步很重，咚咚咚的，像是很着急的样子..."',
-                '"第二个人穿着高跟鞋，那鞋跟也太尖了，真是要了我的老命！"',
-                '"第三个人倒是很轻，但是脚步很小心，像是在偷偷摸摸的..."'
+                '地板："哎呦，我的腰！今晚可把我踩得够呛..."',
+                '"第二个进来的那位，鞋跟也太尖了，差点没把握戳穿！"'
             ]
         }
     }
@@ -485,7 +480,11 @@ function unlockPlotSegments(dialogueType) {
 
 // 关闭对话
 function closeDialogue() {
-    document.getElementById('dialogueModal').style.display = 'none';
+    const modal = document.getElementById('dialogueModal');
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
 }
 
 // 更新进度
@@ -551,15 +550,16 @@ function showPlotSorting() {
     
     body.innerHTML = `
         <div class="plot-instruction">
-            <p>根据物品的证词，将下列情节按时间顺序排列：</p>
-            <p class="drag-hint">💡 拖拽情节项到合适的位置进行排序</p>
-            <p class="save-hint">💾 可随时关闭窗口，排序进度会自动保存</p>
+            <p>将情节按时间顺序排列，就能找到真凶：</p>
+            <p class="drag-hint">💡 长按2秒拖拽情节项到合适的位置</p>
+            <p class="correct-hint">✅ 绿色边框表示该事件位置正确</p>
         </div>
         <div class="plot-list" id="plotList">
             ${orderedSegments.map((segment, index) => `
                 <div class="plot-item" 
                      data-id="${segment.id}" 
                      data-index="${index}"
+                     data-correct-order="${segment.order}"
                      draggable="true"
                      ondragstart="handleDragStart(event)"
                      ondragover="handleDragOver(event)"
@@ -569,13 +569,65 @@ function showPlotSorting() {
                      ondragend="handleDragEnd(event)">
                     <span class="plot-number">${index + 1}</span>
                     <span class="plot-text">${segment.text}</span>
+                    <span class="plot-status"></span>
                     <span class="drag-handle">⋮⋮</span>
                 </div>
             `).join('')}
         </div>
     `;
     
+    // 检查初始排序的正确性
+    checkPlotCorrectness();
+    
     modal.style.display = 'flex';
+    modal.classList.add('show');
+}
+
+// 检查情节排序的正确性
+function checkPlotCorrectness() {
+    const plotItems = document.querySelectorAll('.plot-item');
+    if (!plotItems.length) return;
+    
+    // 获取正确的排序数组
+    const correctOrder = gameState.unlockedSegments
+        .sort((a, b) => a.order - b.order)
+        .map(s => s.order);
+    
+    plotItems.forEach((item, currentIndex) => {
+        const correctOrderValue = parseInt(item.dataset.correctOrder);
+        const expectedOrderAtThisPosition = correctOrder[currentIndex];
+        const statusElement = item.querySelector('.plot-status');
+        
+        // 检查是否在正确位置
+        if (correctOrderValue === expectedOrderAtThisPosition) {
+            item.classList.add('correct-position');
+            item.classList.remove('incorrect-position');
+            statusElement.textContent = '✓';
+            statusElement.className = 'plot-status correct-status';
+        } else {
+            item.classList.remove('correct-position');
+            item.classList.add('incorrect-position');
+            statusElement.textContent = '';
+            statusElement.className = 'plot-status';
+        }
+    });
+    
+    // 检查是否全部正确
+    const correctCount = document.querySelectorAll('.plot-item.correct-position').length;
+    const totalCount = plotItems.length;
+    
+    if (correctCount === totalCount) {
+        // 全部正确时给一个特殊提示
+        setTimeout(() => {
+            const plotList = document.getElementById('plotList');
+            if (plotList) {
+                plotList.classList.add('all-correct');
+                setTimeout(() => {
+                    plotList.classList.remove('all-correct');
+                }, 1000);
+            }
+        }, 100);
+    }
 }
 
 // 关闭情节排序界面并保存当前状态
@@ -585,7 +637,10 @@ function closePlotSorting() {
     
     // 关闭模态框
     const modal = document.getElementById('plotModal');
-    modal.style.display = 'none';
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
     
     console.log('已保存排序进度:', gameState.savedSortOrder);
 }
@@ -817,15 +872,20 @@ function updateItemIndicesAndNumbers() {
             numberSpan.textContent = index + 1;
         }
         
-        // 添加轻微的更新动画
-        item.style.transition = 'background-color 0.2s ease';
-        item.style.backgroundColor = '#4c4c4c';
+                    // 添加轻微的更新动画
+            item.style.transition = 'background-color 0.2s ease';
+            item.style.backgroundColor = '#4c4c4c';
+            
+            setTimeout(() => {
+                item.style.backgroundColor = '';
+            }, 200);
+        });
         
+        // 更新正确性检查
         setTimeout(() => {
-            item.style.backgroundColor = '';
-        }, 200);
-    });
-}
+            checkPlotCorrectness();
+        }, 250);
+    }
 
 // 拖拽结束
 function handleDragEnd(e) {
@@ -871,9 +931,13 @@ function checkPlotOrder() {
         // 清除保存的排序状态（因为已经完成了）
         gameState.savedSortOrder = [];
         // 关闭情节排序窗口
-        document.getElementById('plotModal').style.display = 'none';
-        // 显示真凶选择窗口
-        showSuspectSelection();
+        const plotModal = document.getElementById('plotModal');
+        plotModal.classList.remove('show');
+        setTimeout(() => {
+            plotModal.style.display = 'none';
+            // 显示真凶选择窗口
+            showSuspectSelection();
+        }, 300);
     } else {
         alert('推理不正确，再想想吧！注意时间线的逻辑关系。');
     }
@@ -902,6 +966,7 @@ function showSuspectSelection() {
     `;
     
     modal.style.display = 'flex';
+    modal.classList.add('show');
 }
 
 // 选择嫌疑人卡片
@@ -928,7 +993,11 @@ function makeAccusation() {
     if (!selectedSuspectId) return;
     
     // 关闭嫌疑人选择窗口
-    document.getElementById('suspectModal').style.display = 'none';
+    const suspectModal = document.getElementById('suspectModal');
+    suspectModal.classList.remove('show');
+    setTimeout(() => {
+        suspectModal.style.display = 'none';
+    }, 300);
     
     // 检查是否选择正确（刘志强是真凶，对应suspectId=1）
     const isCorrect = selectedSuspectId === 1;
@@ -953,10 +1022,10 @@ function showVictoryEnding() {
         <p style="margin-bottom: 15px;">恭喜你！成功破解了这起复杂的案件。</p>
         <p style="margin-bottom: 15px;">真凶正是商业仇敌刘志强，他因为生意纠纷愤而投毒，这是真正的致命一击。</p>
         <p style="margin-bottom: 15px;">而快递员张伟虽然蓄谋已久，精心策划了安眠药计划，但当他用枕头想要"杀死"富商时，富商早已因中毒而死亡。</p>
-        <p>物品们的证词帮助你还原了完整的时间线，正义终将得到伸张！</p>
     `;
     
     modal.style.display = 'flex';
+    modal.classList.add('show');
 }
 
 // 显示失败结局
@@ -968,22 +1037,29 @@ function showFailureEnding() {
     title.textContent = '🤔 推理有误';
     text.innerHTML = `
         <p style="margin-bottom: 15px;">很遗憾，你的推理有误。</p>
-        <p style="margin-bottom: 15px;">真正的凶手是商业仇敌刘志强，他在红酒中投毒才是致命的一击。</p>
         <p style="margin-bottom: 15px;">建议重新仔细分析物品们的证词，注意时间线和因果关系。</p>
         <p>每个细节都很重要，真相往往隐藏在看似平常的对话中。</p>
     `;
     
     modal.style.display = 'flex';
+    modal.classList.add('show');
 }
 
 // 重新开始游戏
 function restartGame() {
     // 关闭所有模态框
-    document.getElementById('resultModal').style.display = 'none';
-    document.getElementById('plotModal').style.display = 'none';
-    document.getElementById('suspectModal').style.display = 'none';
-    document.getElementById('dialogueModal').style.display = 'none';
-    document.getElementById('profileModal').style.display = 'none';
+    const modals = ['resultModal', 'plotModal', 'suspectModal', 'dialogueModal', 'profileModal'];
+    modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+    });
+    
+    // 关闭对话气泡
+    const overlay = document.getElementById('dialogueOverlay');
+    if (overlay) {
+        overlay.classList.remove('show');
+    }
     
     // 隐藏游戏界面，显示首页
     document.getElementById('gameContainer').style.display = 'none';
@@ -994,6 +1070,7 @@ function restartGame() {
 function showProfileModal() {
     const modal = document.getElementById('profileModal');
     modal.style.display = 'flex';
+    modal.classList.add('show');
     
     // 添加导航按钮事件监听器
     document.querySelectorAll('.profile-nav-btn').forEach(btn => {
@@ -1045,7 +1122,11 @@ function showSuspectProfile(suspectId) {
 }
 
 function closeProfileModal() {
-    document.getElementById('profileModal').style.display = 'none';
+    const modal = document.getElementById('profileModal');
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
 }
 
 // 页面加载完成后不需要初始化游戏，等待用户点击开始游戏

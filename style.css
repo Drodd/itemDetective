@@ -20,10 +20,13 @@ body {
 .homepage {
     width: 100vw;
     height: 100vh;
+    height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, #8B7ED8 0%, #9B59B6 100%);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .homepage-content {
@@ -107,9 +110,11 @@ body {
 .game-container {
     width: 100vw;
     height: 100vh;
+    height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
     max-width: 400px;
     max-height: 711px;
     margin: 0 auto;
+    margin-top: env(safe-area-inset-top, 0px);
     position: relative;
     background: #ffffff;
     border-radius: 20px;
@@ -120,7 +125,8 @@ body {
 
 .scene-wrapper {
     width: 100%;
-    height: calc(100% - 80px);
+    height: calc(100% - 80px - env(safe-area-inset-bottom, 0px));
+    height: calc(100% - 100px - env(safe-area-inset-bottom, 0px));
     position: relative;
     overflow: hidden;
     cursor: grab;
@@ -189,7 +195,7 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 80px;
+    min-height: 80px;
     background: linear-gradient(to top, #f8f9fa, #ffffff);
     display: flex;
     align-items: center;
@@ -197,6 +203,8 @@ body {
     gap: 15px;
     border-top: 1px solid #e9ecef;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
 }
 
 .reconstruct-btn {
@@ -259,6 +267,35 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    opacity: 0;
+    animation: modalFadeIn 0.3s ease-out forwards;
+}
+
+.dialogue-modal.show {
+    display: flex;
+}
+
+/* 通用模态框入场动画 */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes modalContentSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .dialogue-content {
@@ -270,6 +307,7 @@ body {
     overflow-y: auto;
     border: 2px solid rgba(255, 183, 153, 0.5);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    animation: modalContentSlideIn 0.4s ease-out 0.1s both;
 }
 
 .dialogue-title {
@@ -319,13 +357,15 @@ body {
     justify-content: center;
     z-index: 1000;
     opacity: 0;
-    transition: opacity 0.5s ease;
+    transform: scale(0.95);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 40px 20px;
 }
 
 .dialogue-overlay.show {
     display: flex;
     opacity: 1;
+    transform: scale(1);
 }
 
 .dialogue-container {
@@ -452,6 +492,12 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    opacity: 0;
+    animation: modalFadeIn 0.3s ease-out forwards;
+}
+
+.plot-modal.show {
+    display: flex;
 }
 
 .plot-content {
@@ -463,6 +509,7 @@ body {
     overflow-y: auto;
     border: 2px solid rgba(255, 183, 153, 0.5);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    animation: modalContentSlideIn 0.4s ease-out 0.1s both;
 }
 
 .plot-header {
@@ -515,6 +562,13 @@ body {
     margin-top: 10px;
     font-size: 12px;
     color: #a1887f;
+    font-style: italic;
+}
+
+.correct-hint {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #4CAF50;
     font-style: italic;
 }
 
@@ -572,6 +626,17 @@ body {
     transform: translateY(-3px);
 }
 
+.plot-item.correct-position {
+    border-left-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.05);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.plot-item.correct-position:hover {
+    background: rgba(76, 175, 80, 0.1);
+    border-color: rgba(76, 175, 80, 0.5);
+}
+
 .plot-number {
     display: inline-flex;
     align-items: center;
@@ -592,6 +657,33 @@ body {
     font-size: 14px;
     line-height: 1.4;
     color: #5d4037;
+}
+
+.plot-status {
+    margin-right: 8px;
+    font-size: 16px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.plot-status.correct-status {
+    color: #4CAF50;
+    animation: correctPulse 0.5s ease-in-out;
+}
+
+@keyframes correctPulse {
+    0% { 
+        transform: scale(1);
+        opacity: 0;
+    }
+    50% { 
+        transform: scale(1.3);
+        opacity: 1;
+    }
+    100% { 
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .drag-handle {
@@ -674,6 +766,22 @@ body {
     }
 }
 
+.plot-list.all-correct {
+    animation: allCorrectGlow 1s ease-in-out;
+}
+
+@keyframes allCorrectGlow {
+    0% { 
+        box-shadow: 0 0 0 rgba(76, 175, 80, 0);
+    }
+    50% { 
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+    }
+    100% { 
+        box-shadow: 0 0 0 rgba(76, 175, 80, 0);
+    }
+}
+
 .confirm-btn {
     display: block;
     margin: 0 auto;
@@ -708,6 +816,12 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 1100;
+    opacity: 0;
+    animation: modalFadeIn 0.3s ease-out forwards;
+}
+
+.suspect-modal.show {
+    display: flex;
 }
 
 .suspect-content {
@@ -718,6 +832,7 @@ body {
     text-align: center;
     border: 2px solid rgba(255, 183, 153, 0.5);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    animation: modalContentSlideIn 0.4s ease-out 0.1s both;
 }
 
 .final-judgment-container {
@@ -823,60 +938,165 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     display: none;
     align-items: center;
     justify-content: center;
     z-index: 1200;
+    opacity: 0;
+    animation: modalFadeIn 0.5s ease-out forwards;
+}
+
+.result-modal.show {
+    display: flex;
 }
 
 .result-content {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 30px;
-    border-radius: 15px;
-    max-width: 90%;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 251, 235, 0.95));
+    padding: 40px 35px;
+    border-radius: 25px;
+    max-width: 85%;
     text-align: center;
-    border: 2px solid rgba(255, 152, 0, 0.6);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 215, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    animation: modalContentSlideIn 0.6s ease-out 0.2s both;
+    position: relative;
+    overflow: hidden;
+}
+
+.result-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, 
+        transparent 30%, 
+        rgba(255, 215, 0, 0.1) 50%, 
+        transparent 70%);
+    pointer-events: none;
 }
 
 .result-title {
-    font-size: 24px;
+    font-size: 32px;
     font-weight: bold;
-    margin-bottom: 20px;
-    color: #5d4037;
+    margin-bottom: 25px;
+    color: #4A2C2A;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
+    animation: titleGlow 0.8s ease-out 0.4s both;
+}
+
+@keyframes titleGlow {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        text-shadow: 
+            2px 2px 4px rgba(0, 0, 0, 0.1),
+            0 0 20px rgba(255, 215, 0, 0.3);
+    }
 }
 
 .result-text {
-    font-size: 16px;
-    margin-bottom: 25px;
-    line-height: 1.6;
-    color: #8d6e63;
+    font-size: 17px;
+    margin-bottom: 30px;
+    line-height: 1.7;
+    color: #5D4037;
+    position: relative;
+    z-index: 1;
+    animation: textSlideIn 0.8s ease-out 0.6s both;
+    background: rgba(255, 248, 220, 0.6);
+    padding: 20px;
+    border-radius: 15px;
+    border-left: 4px solid #FFD700;
+}
+
+@keyframes textSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .restart-btn {
-    padding: 15px 30px;
-    background: linear-gradient(135deg, #ffb899, #ff9068);
-    color: #5d4037;
+    padding: 18px 40px;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #4A2C2A;
     border: none;
-    border-radius: 25px;
-    font-size: 16px;
+    border-radius: 30px;
+    font-size: 18px;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     user-select: none;
+    position: relative;
+    z-index: 1;
+    animation: buttonSlideIn 0.8s ease-out 0.8s both;
+    box-shadow: 
+        0 8px 25px rgba(255, 215, 0, 0.4),
+        0 4px 10px rgba(0, 0, 0, 0.1);
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+    overflow: hidden;
+}
+
+.restart-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.4), 
+        transparent);
+    transition: left 0.6s ease;
+}
+
+.restart-btn:hover::before {
+    left: 100%;
 }
 
 .restart-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 183, 153, 0.4);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 
+        0 12px 35px rgba(255, 215, 0, 0.6),
+        0 6px 15px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #FFA500, #FFD700);
+}
+
+@keyframes buttonSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .progress-bar {
     position: absolute;
-    top: 10px;
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    top: max(10px, calc(10px + env(safe-area-inset-top, 0px)));
     left: 20px;
     right: 20px;
     height: 6px;
@@ -965,6 +1185,12 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 1050;
+    opacity: 0;
+    animation: modalFadeIn 0.3s ease-out forwards;
+}
+
+.profile-modal.show {
+    display: flex;
 }
 
 .profile-content {
@@ -975,6 +1201,7 @@ body {
     border: 2px solid rgba(232, 213, 183, 0.5);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    animation: modalContentSlideIn 0.4s ease-out 0.1s both;
 }
 
 .profile-header {
@@ -1220,5 +1447,25 @@ body {
     .start-game-btn {
         padding: 12px 30px;
         font-size: 16px;
+    }
+    
+    /* 移动端底部安全区域额外处理 */
+    .control-panel {
+        padding-bottom: max(env(safe-area-inset-bottom, 0px), 30px);
+        min-height: 90px;
+    }
+    
+    .scene-wrapper {
+        height: calc(100% - 120px - env(safe-area-inset-bottom, 0px));
+    }
+    
+    .game-container {
+        border-radius: 0;
+        max-width: 100vw;
+        max-height: 100vh;
+    }
+    
+    .homepage-content {
+        margin-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
     }
 } 
