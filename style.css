@@ -1115,16 +1115,38 @@ body {
 }
 
 @media (max-width: 480px) {
+    /* 移动端模态框通用适配 */
+    .dialogue-modal,
+    .plot-modal,
+    .suspect-modal,
+    .result-modal,
+    .profile-modal {
+        padding-bottom: max(env(safe-area-inset-bottom, 0px), 80px);
+    }
+    
     .dialogue-content {
-        padding: 15px;
+        padding: 15px 15px max(20px, env(safe-area-inset-bottom, 0px));
+        margin-bottom: 20px;
+        max-height: 75vh;
     }
     
     .plot-content {
-        padding: 20px;
+        padding: 20px 20px max(30px, env(safe-area-inset-bottom, 0px));
+        margin-bottom: 20px;
+        max-height: 80vh;
     }
     
     .suspect-content {
-        padding: 25px;
+        padding: 25px 25px max(40px, env(safe-area-inset-bottom, 0px));
+        margin-bottom: 20px;
+        max-height: 80vh;
+    }
+    
+    .result-content {
+        padding: 25px 25px max(40px, env(safe-area-inset-bottom, 0px));
+        margin-bottom: 20px;
+        max-height: 80vh;
+        overflow-y: auto;
     }
     
     .judgment-title {
@@ -1154,10 +1176,25 @@ body {
     .accuse-btn {
         padding: 12px 30px;
         font-size: 16px;
+        margin-bottom: max(30px, env(safe-area-inset-bottom, 0px));
+        position: relative;
+        z-index: 10;
     }
     
+    .restart-btn {
+        margin-bottom: max(30px, env(safe-area-inset-bottom, 0px));
+        position: relative;
+        z-index: 10;
+    }
+    
+    /* 特别处理结算界面，确保按钮在视口内 */
     .result-content {
-        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: auto;
+        max-height: calc(100vh - 120px);
     }
     
     .plot-item {
@@ -1168,6 +1205,59 @@ body {
         font-size: 13px;
     }
     
+    /* 气泡对话移动端适配 */
+    .dialogue-overlay {
+        padding: 20px 20px max(40px, env(safe-area-inset-bottom, 0px));
+    }
+    
+    .bubble-close {
+        margin-bottom: max(30px, env(safe-area-inset-bottom, 0px));
+        position: relative;
+        z-index: 10;
+    }
+    
+    /* 确保所有模态框按钮在移动端可见 */
+    .dialogue-close,
+    .confirm-btn,
+    .plot-close-btn,
+    .profile-close-btn {
+        margin-bottom: max(15px, env(safe-area-inset-bottom, 0px));
+        position: relative;
+        z-index: 10;
+    }
+    
+    /* 移动端额外的底部空间确保按钮可见 */
+    .final-judgment-container {
+        padding-bottom: max(30px, env(safe-area-inset-bottom, 0px));
+    }
+    
+    /* 确保所有弹窗内容在移动端浏览器UI下方 */
+    .dialogue-modal .dialogue-content,
+    .plot-modal .plot-content,
+    .suspect-modal .suspect-content,
+    .result-modal .result-content,
+    .profile-modal .profile-content {
+        margin-bottom: max(30px, env(safe-area-inset-bottom, 0px));
+    }
+    
+    /* 处理移动端浏览器地址栏动态隐藏 */
+    @supports (height: 100dvh) {
+        .dialogue-modal,
+        .plot-modal,
+        .suspect-modal,
+        .result-modal,
+        .profile-modal {
+            height: 100dvh;
+        }
+        
+        .homepage {
+            height: 100dvh;
+        }
+        
+        .game-container {
+            height: 100dvh;
+        }
+    }
 
 }
 
