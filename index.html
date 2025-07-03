@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幻听神探</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 首页 -->
+    <div class="homepage" id="homepage">
+        <div class="homepage-content">
+            <div class="game-title">幻听神探</div>
+            
+            <div class="case-background">
+                <div class="case-description">
+                    <p>一位富商在自己的豪华公寓中神秘死亡。现场看似意外，但细心的侦探发现了蛛丝马迹...</p>
+                    <p>奇怪的是，房间里的物品们似乎都在窃窃私语，它们见证了当晚发生的一切。</p>
+                    <p>作为一名拥有特殊能力的侦探，你能听懂物品们的对话。通过它们的证词，还原真相，找出真凶！</p>
+                </div>
+            </div>
+            
+            <button class="start-game-btn" onclick="startGame()">开始调查</button>
+        </div>
+    </div>
+
+    <div class="game-container" id="gameContainer" style="display: none;">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="scene-wrapper" id="sceneWrapper">
+            <img src="img_bg.png" alt="犯罪现场" class="scene-image" id="sceneImage">
+            
+            <!-- 触发点容器，跟随背景移动 -->
+            <div class="triggers-container" id="triggersContainer">
+                <!-- 对话触发点 -->
+                <div class="dialogue-trigger" data-dialogue="wine-glasses">
+                    <span>...</span>
+                </div>
+                
+                <div class="dialogue-trigger" data-dialogue="sofas">
+                    <span>...</span>
+                </div>
+                
+                <div class="dialogue-trigger" data-dialogue="sofas2">
+                    <span>...</span>
+                </div>
+                
+                <div class="dialogue-trigger" data-dialogue="door">
+                    <span>...</span>
+                </div>
+                
+                <div class="dialogue-trigger" data-dialogue="bed">
+                    <span>...</span>
+                </div>
+                
+                <div class="dialogue-trigger" data-dialogue="drink">
+                    <span>...</span>
+                </div>
+                
+                <div class="dialogue-trigger" data-dialogue="floor">
+                    <span>...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-panel">
+            <button class="suspect-profile-btn" id="suspectProfileBtn">
+                嫌疑人档案
+            </button>
+            <button class="reconstruct-btn" id="reconstructBtn" disabled>
+                还原案件 (0/7)
+            </button>
+        </div>
+        
+        <!-- 对话模态框 -->
+        <div class="dialogue-modal" id="dialogueModal">
+            <div class="dialogue-content">
+                <div class="dialogue-title" id="dialogueTitle"></div>
+                <div id="dialogueBody"></div>
+                <button class="dialogue-close" onclick="closeDialogue()">关闭</button>
+            </div>
+        </div>
+        
+        <!-- 新的对话气泡系统 -->
+        <div class="dialogue-overlay" id="dialogueOverlay">
+            <div class="dialogue-container">
+                <div class="bubble-title" id="bubbleTitle"></div>
+                <div class="bubble-content" id="bubbleContent"></div>
+                <button class="bubble-close" id="bubbleCloseBtn" onclick="closeBubbleDialogue()">关闭</button>
+            </div>
+        </div>
+        
+        <!-- 情节排序模态框 -->
+        <div class="plot-modal" id="plotModal">
+            <div class="plot-content">
+                <div class="plot-header">
+                    <div class="plot-title">还原案件时间线</div>
+                    <button class="plot-close-btn" onclick="closePlotSorting()">×</button>
+                </div>
+                <div id="plotBody"></div>
+                <button class="confirm-btn" onclick="checkPlotOrder()">就是这样！</button>
+            </div>
+        </div>
+        
+        <!-- 嫌疑人选择模态框 -->
+        <div class="suspect-modal" id="suspectModal">
+            <div class="suspect-content">
+                <div class="suspect-title">指认真凶</div>
+                <div id="suspectBody"></div>
+            </div>
+        </div>
+        
+        <!-- 嫌疑人档案模态框 -->
+        <div class="profile-modal" id="profileModal">
+            <div class="profile-content">
+                <div class="profile-header">
+                    <div class="profile-title">嫌疑人档案</div>
+                    <button class="profile-close-btn" onclick="closeProfileModal()">×</button>
+                </div>
+                <div class="profile-body">
+                    <div class="profile-nav">
+                        <button class="profile-nav-btn active" data-suspect="1">刘志强</button>
+                        <button class="profile-nav-btn" data-suspect="2">林小雨</button>
+                        <button class="profile-nav-btn" data-suspect="3">张伟</button>
+                    </div>
+                    <div class="profile-card" id="profileCard">
+                        <!-- 档案内容将通过JavaScript动态填充 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果模态框 -->
+        <div class="result-modal" id="resultModal">
+            <div class="result-content">
+                <div class="result-title" id="resultTitle"></div>
+                <div class="result-text" id="resultText"></div>
+                <button class="restart-btn" onclick="restartGame()">重新开始</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
